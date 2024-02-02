@@ -11,6 +11,9 @@ public class MeshMaker : MonoBehaviour
     [Min(0.01f)]
     public float length;
 
+    [Min(0.01f)]
+    public float polygonSideLength;
+
     public void MakeMesh()
     {
         Debug.Log("GenerateMesh invoked...");
@@ -20,7 +23,7 @@ public class MeshMaker : MonoBehaviour
         var texture = GetTexture();
 
         Debug.Log("Getting mesh...");
-        var meshData = PolygonalCylinderMeshMaker.GenerateMeshData(numSides, length);
+        var meshData = PolygonalCylinderMeshMaker.GenerateMeshData(numSides, length, polygonSideLength);
 
         Debug.Log("Drawing mesh...");
         drawer.DrawMesh(meshData, texture);

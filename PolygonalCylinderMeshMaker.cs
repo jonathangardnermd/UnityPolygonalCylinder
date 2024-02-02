@@ -1,10 +1,10 @@
 using UnityEngine;
 public static class PolygonalCylinderMeshMaker
 {
-    public static MeshData GenerateMeshData(int numSides, float length)
+    public static MeshData GenerateMeshData(int numSides, float length, float polygonSideLength)
     {
         // return DemoDataUtil.GetDemoData();
-        var pc = new PolygonCylinder(numSides, length);
+        var pc = new PolygonCylinder(numSides, length, polygonSideLength);
         return pc.meshData;
     }
 }
@@ -13,27 +13,28 @@ public class PolygonCylinder
 {
     public int numSides;
     public float length;
+    public float polygonSideLength;
 
     public MeshData meshData;
     private Polygon polygon;
 
-    public PolygonCylinder(int numSides, float length)
+    public PolygonCylinder(int numSides, float length, float polygonSideLength)
     {
         this.numSides = numSides;
         this.length = length;
-        this.GeneratePolygonCylinder();
+        this.polygonSideLength = polygonSideLength;
+        GeneratePolygonCylinder();
     }
-
 
     private void GeneratePolygonCylinder()
     {
         meshData = new MeshData();
-        polygon = new Polygon(numSides);
+        polygon = new Polygon(numSides, polygonSideLength);
 
         BuildMesh();
 
-        // Debug.Log(meshData.TrianglesToString());
-        // Debug.Log($"len(meshData.vertices)={meshData.vertices.Length}, len(meshData.triangles)={meshData.triangles.Length}, len(meshData.Triangles)={meshData.Triangles.Length}");
+        Debug.Log("Triangles used:\n" + meshData.TrianglesToString());
+        Debug.Log($"NumVertices={meshData.vertices.Length}, NumTriangleIdxs={meshData.triangleIdxs.Length}, NumTriangles={meshData.Triangles.Length}");
     }
 
     void StackPolygon(float z1, float z2)
@@ -76,13 +77,13 @@ public class Polygon
     public Vector2[] vertices;
     public float[] angularUvs;
 
-    public Polygon(int numSides)
+    public Polygon(int numSides, float sideLength)
     {
         this.numSides = numSides;
-        SetVertices();
+        SetVertices(sideLength);
     }
 
-    void SetVertices()
+    void SetVertices(float sideLength)
     {
         float angle = 2 * Mathf.PI / numSides;
         vertices = new Vector2[numSides];
@@ -90,8 +91,8 @@ public class Polygon
 
         for (int i = 0; i < numSides; i++)
         {
-            float x = Mathf.Cos(i * angle);
-            float y = Mathf.Sin(i * angle);
+            float x = sideLength * Mathf.Cos(i * angle);
+            float y = sideLength * Mathf.Sin(i * angle);
             vertices[i] = new Vector2(x, y);
             angularUvs[i] = (float)i / numSides;
         }

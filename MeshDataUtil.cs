@@ -15,14 +15,14 @@ public class Triangle
 
     public override string ToString()
     {
-        return $"{vertex1}, {vertex2}, {vertex3}";
+        return string.Format("{0,-40}{1,-40}{2,-40}", vertex1, vertex2, vertex3);
     }
 }
 
 public class MeshData
 {
     public Vector3[] vertices;
-    public int[] triangles;
+    public int[] triangleIdxs;
     public Vector2[] uvs;
 
     private int lastVertexIdx = -1;
@@ -35,7 +35,7 @@ public class MeshData
     public void Reset()
     {
         vertices = new Vector3[0];
-        triangles = new int[0];
+        triangleIdxs = new int[0];
         uvs = new Vector2[0];
         lastVertexIdx = -1;
     }
@@ -54,24 +54,24 @@ public class MeshData
 
     public void AddTriangleIdxs(int i1, int i2, int i3)
     {
-        int oldLength = triangles.Length;
-        System.Array.Resize(ref triangles, oldLength + 3);
+        int oldLength = triangleIdxs.Length;
+        System.Array.Resize(ref triangleIdxs, oldLength + 3);
 
-        triangles[oldLength] = i1;
-        triangles[oldLength + 1] = i2;
-        triangles[oldLength + 2] = i3;
+        triangleIdxs[oldLength] = i1;
+        triangleIdxs[oldLength + 1] = i2;
+        triangleIdxs[oldLength + 2] = i3;
     }
 
     public Triangle[] Triangles
     {
         get
         {
-            int triangleCount = triangles.Length / 3;
+            int triangleCount = triangleIdxs.Length / 3;
             Triangle[] triangleArray = new Triangle[triangleCount];
             for (int i = 0; i < triangleCount; i++)
             {
                 int idx = i * 3;
-                triangleArray[i] = new Triangle(vertices[triangles[idx]], vertices[triangles[idx + 1]], vertices[triangles[idx + 2]]);
+                triangleArray[i] = new Triangle(vertices[triangleIdxs[idx]], vertices[triangleIdxs[idx + 1]], vertices[triangleIdxs[idx + 2]]);
             }
             return triangleArray;
         }
@@ -89,10 +89,12 @@ public class MeshData
 
     public Mesh CreateMesh()
     {
-        Mesh mesh = new Mesh();
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        mesh.uv = uvs;
+        Mesh mesh = new Mesh
+        {
+            vertices = vertices,
+            triangles = triangleIdxs,
+            uv = uvs
+        };
         mesh.RecalculateNormals();
         return mesh;
     }
